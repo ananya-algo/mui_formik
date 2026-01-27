@@ -1,0 +1,72 @@
+.homepage-container {
+  min-height: 100vh;
+  background: #f9fafb;
+}
+
+/* Navbar Styles */
+.homepage-navbar {
+  background: white;
+  padding: 16px 32px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.homepage-navbar-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #1f2937;
+  margin: 0;
+}
+
+.homepage-logout-button {
+  padding: 8px 16px;
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.homepage-logout-button:hover {
+  background: #dc2626;
+}
+
+/* Main Content Styles */
+.homepage-content {
+  padding: 32px;
+}
+
+/* Welcome Section */
+.homepage-welcome {
+  margin-bottom: 32px;
+}
+
+.homepage-welcome-title {
+  font-size: 28px;
+  font-weight: bold;
+  color: #1f2937;
+  margin: 0 0 8px 0;
+}
+
+.homepage-welcome-subtitle {
+  font-size: 16px;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* Charts Grid */
+.homepage-charts-grid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(5, 1fr);
+  margin-bottom: 24px;
+}
+
+/* Monthly Summary Section */
+.homepage-monthly-section {
+  margin-top: 24px;
+}
