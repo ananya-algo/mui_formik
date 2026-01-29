@@ -7,34 +7,42 @@ const ViolationsPieChart = () => {
   const chartOptions = {
     chart: {
       type: 'pie',
-      height: 200,
-      backgroundColor: 'transparent'
+      height: 145,
+      width: 145,
+      backgroundColor: 'transparent',
+      spacing: [0, 0, 0, 0],
+      margin: [0, 0, 0, 0]
     },
     title: {
       text: '87.5%',
       align: 'center',
       verticalAlign: 'middle',
       style: {
-        fontSize: '20px',
+        fontSize: '11px',
         fontWeight: 'bold',
-        color: '#1f2937'
+        color: '#34A853',
+        lineHeight: '11px'
       },
-      y: 0
+      y: 2,
+      x: 0
     },
     tooltip: {
       pointFormat: '{series.name}: <b>{point.y}</b>'
     },
     plotOptions: {
       pie: {
-        innerSize: '70%',
+        innerSize: '75%',
         dataLabels: {
           enabled: false
         },
+        enableMouseTracking: false,
         states: {
           hover: {
-            brightness: 0.1
+            enabled: false
           }
-        }
+        },
+        borderWidth: 0,
+        center: ['50%', '50%']
       }
     },
     series: [{

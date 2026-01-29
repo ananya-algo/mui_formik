@@ -7,24 +7,47 @@ const LineChart = ({ data, title }) => {
   const chartOptions = {
     chart: {
       type: 'line',
-      height: 280,
-      backgroundColor: 'transparent'
+      height: 140,
+      backgroundColor: 'transparent',
+      spacing: [10, 10, 10, 10]
     },
     title: {
       text: null
     },
     xAxis: {
       categories: data.categories,
-      lineColor: '#e5e7eb',
-      tickColor: '#e5e7eb'
+      lineColor: '#D1D5DB',
+      lineWidth: 1,
+      tickColor: '#D1D5DB',
+      tickWidth: 1,
+      visible: true,
+      labels: {
+        style: {
+          fontSize: '9px',
+          color: '#6B7280'
+        }
+      }
     },
     yAxis: {
       title: {
         text: null
       },
-      min: 0,
+      min: 80,
       max: 100,
-      gridLineColor: '#e5e7eb'
+      tickInterval: 5,
+      gridLineColor: '#E5E7EB',
+      gridLineWidth: 1,
+      lineColor: '#D1D5DB',
+      lineWidth: 1,
+      visible: true,
+      labels: {
+        style: {
+          fontSize: '9px',
+          color: '#6B7280'
+        },
+        format: '{value}%'
+      },
+      tickPositions: [80, 85, 90, 95, 100]
     },
     legend: {
       enabled: false
@@ -32,8 +55,19 @@ const LineChart = ({ data, title }) => {
     plotOptions: {
       line: {
         marker: {
+          radius: 4,
           enabled: true,
-          radius: 4
+          symbol: 'circle'
+        },
+        lineWidth: 2,
+        dataLabels: {
+          enabled: true,
+          style: {
+            fontSize: '9px',
+            fontWeight: 'normal',
+            textOutline: 'none'
+          },
+          format: '{y}%'
         }
       }
     },
@@ -41,14 +75,18 @@ const LineChart = ({ data, title }) => {
       {
         name: 'Plant Quality Rating',
         data: data.quality,
-        color: '#3b82f6',
-        lineWidth: 2
+        color: '#0077B6',
+        dataLabels: {
+          color: '#0077B6'
+        }
       },
       {
         name: 'Plan Compliance',
         data: data.compliance,
-        color: '#f59e0b',
-        lineWidth: 2
+        color: '#EA8600',
+        dataLabels: {
+          color: '#EA8600'
+        }
       }
     ],
     credits: {
@@ -62,9 +100,9 @@ const LineChart = ({ data, title }) => {
 
   return (
     <div className="line-chart-container">
-      <h3 className="line-chart-header">
+      <div className="line-chart-header">
         {title}
-        <span className="line-chart-legend">
+        <div className="line-chart-legend">
           <span className="line-chart-legend-item">
             <span className="line-chart-legend-color quality"></span>
             Plant Quality Rating
@@ -73,8 +111,8 @@ const LineChart = ({ data, title }) => {
             <span className="line-chart-legend-color compliance"></span>
             Plan Compliance
           </span>
-        </span>
-      </h3>
+        </div>
+      </div>
       <HighchartsReact
         highcharts={Highcharts}
         options={chartOptions}

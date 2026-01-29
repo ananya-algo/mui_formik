@@ -1,26 +1,32 @@
+:root {
+  --primary-nuetral-action-active-border-0077b6: #0077B6;
+  --secondary-neutral-action-hover-ea8600: #EA8600;
+  --secondary-positive-action-34a853: #34A853;
+}
+
 .pie-chart-container {
-  background: white;
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  background: transparent;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  height: 300px;
+  gap: 24px;
 }
 
 .pie-chart-title {
+  padding-top: 20px;
+  padding-bottom: 0px;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 500;
   color: #374151;
   margin: 0;
   text-align: center;
-  min-height: 36px;
-  display: flex;
-  align-items: center;
+  opacity: 1;
 }
 
 .pie-chart-wrapper {
-  width: 100%;
+  width: 145px;
+  height: 145px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

@@ -1,113 +1,113 @@
-import React, { useState } from 'react'
-import { Card, Grid, TextField, Button, Typography, IconButton, InputAdornment, Box } from '@mui/material'
-import { Visibility, VisibilityOff } from '@mui/icons-material'
-import { Formik } from 'formik'
-import * as Yup from 'yup'
-import { useNavigate } from 'react-router-dom'
-import './LoginForm.css'
+import React from 'react';
+import { Formik } from 'formik';
+import * as Yup from 'yup';
+import { useNavigate } from 'react-router-dom';
+import './LoginForm.css';
+import infinityLogo from '../assets/project-infinity.png';
+import algo8Logo from '../assets/algoai.png';
+import secondaryLogo from '../assets/dnacoe.png';
 
 const validationSchema = Yup.object({
-  email: Yup.string().email('Enter a valid email').required('Email is required'),
-  password: Yup.string()
-    .min(6, 'Password must be at least 6 characters')
-    .required('Password is required')
-})
+  sapId: Yup.string().required('SAP ID is required')
+});
 
-const Login = ({ onLogin }) => {
-  const [showPassword, setShowPassword] = useState(false)
-  const navigate = useNavigate()
+const LoginForm = ({ onLogin }) => {
+  const navigate = useNavigate();
 
   return (
     <div className="login-wrapper">
-      <Card className="login-card">
-        <Grid container className="login-grid">
-    
-          <Grid item xs={12} md={6} className="login-right">
-            <Typography variant="h4" className="signin-title">
-              Sign In
-            </Typography>
+      <div className="login-card">
+        <div className="login-container">
+          {/* Left Section - Illustration (70%) */}
+          <div className="login-left">
+            <div className="left-content">
+              <div className="image-container">
+                <img 
+                  src={infinityLogo} 
+                  alt="Infinity Logo" 
+                  className="login-image"
+                />
+              </div>
+              
+              {/* Horizontal divider above project title */}
+              <div className="title-divider"></div>
+              
+              <div className="project-title">
+                Project INFINITI - Digital Plant
+              </div>
+              
+              <div className="footer-branding">
+                <div className="branding-row">
+                  <img 
+                    src={algo8Logo} 
+                    alt="Algo8 Logo" 
+                    className="algo8-logo-image"
+                  />
+                  <span className="brand-divider">|</span>
+                  <span className="brand-text">an algo8.ai product</span>
+                </div>
+                <img 
+                  src={secondaryLogo} 
+                  alt="Partner Logo" 
+                  className="secondary-logo-image"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Vertical Divider */}
+          <div className="vertical-divider"></div>
+
+          {/* Right Section - Form (30%) */}
+          <div className="login-right">
+            <h1 className="signin-title">Sign In</h1>
+            
             <Formik
-              initialValues={{ email: '', password: '' }}
+              initialValues={{ sapId: '' }}
               validationSchema={validationSchema}
               onSubmit={(values, { setSubmitting }) => {
-                onLogin(values)
-                navigate('/home')
-                setSubmitting(false)
+             
+                onLogin(values);
+                
+              
+                navigate('/home');
+                
+                setSubmitting(false);
               }}
             >
               {({ values, errors, touched, handleChange, handleBlur, handleSubmit, isSubmitting }) => (
                 <form onSubmit={handleSubmit} className="login-form">
-                  <TextField
-                    fullWidth
-                    margin="normal"
-                    name="email"
-                    label="Email"
-                    type="email"
-                    value={values.email}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    error={touched.email && Boolean(errors.email)}
-                    helperText={touched.email && errors.email}
-                  />
-                  <TextField
-                    fullWidth
-                    margin="normal"
-                    name="password"
-                    label="Password"
-                    type={showPassword ? 'text' : 'password'}
-                    value={values.password}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    error={touched.password && Boolean(errors.password)}
-                    helperText={touched.password && errors.password}
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <IconButton
-                            onClick={() => setShowPassword(!showPassword)}
-                            edge="end"
-                          >
-                            {showPassword ? <VisibilityOff /> : <Visibility />}
-                          </IconButton>
-                        </InputAdornment>
-                      )
-                    }}
-                  />
-                  <div className="forgot-row">
-                    <Typography variant="body2" className="forgot-password">
-                      Forgot Password?
-                    </Typography>
+                  <div className="form-field">
+                    <label className="field-label">SAP ID</label>
+                    <input
+                      type="text"
+                      name="sapId"
+                      className={`sap-input ${touched.sapId && errors.sapId ? 'error' : ''}`}
+                      placeholder="Enter your SAP ID"
+                      value={values.sapId}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                    />
+                    {touched.sapId && errors.sapId && (
+                      <span className="error-text">{errors.sapId}</span>
+                    )}
                   </div>
-                  <Button
-                    fullWidth
-                    variant="contained"
+
+                  <button
                     type="submit"
                     disabled={isSubmitting}
                     className="signin-button"
                   >
-                    Sign In
-                  </Button>
+                    <span>Sign In</span>
+                  </button>
                 </form>
               )}
             </Formik>
-          </Grid>
-
-      
-          <Grid item xs={12} md={6} className="login-left">
-            <div className="left-content">
-              <div className="image-container">
-                <img
-                  src="https://picsum.photos/500"
-                  alt="Login illustration"
-                  className="login-image"
-                />
-              </div>
-            </div>
-          </Grid>
-        </Grid>
-      </Card>
+          </div>
+        </div>
+      </div>
     </div>
-  )
-}
+  );
+};
 
-export default Login
+export default LoginForm;

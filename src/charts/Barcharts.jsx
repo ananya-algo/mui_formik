@@ -7,8 +7,9 @@ const BarChart = ({ data, title }) => {
   const chartOptions = {
     chart: {
       type: 'column',
-      height: 170,
-      backgroundColor: 'transparent'
+      height: 140,
+      backgroundColor: 'transparent',
+      spacing: [10, 10, 10, 10]
     },
     title: {
       text: null
@@ -19,7 +20,8 @@ const BarChart = ({ data, title }) => {
       tickColor: '#e5e7eb',
       labels: {
         style: {
-          fontSize: '11px'
+          fontSize: '10px',
+          color: '#6B7280'
         }
       }
     },
@@ -29,10 +31,11 @@ const BarChart = ({ data, title }) => {
       },
       min: 0,
       max: 100,
-      gridLineColor: '#e5e7eb',
+      gridLineColor: '#f3f4f6',
       labels: {
         style: {
-          fontSize: '11px'
+          fontSize: '10px',
+          color: '#6B7280'
         }
       }
     },
@@ -50,12 +53,12 @@ const BarChart = ({ data, title }) => {
       {
         name: 'Plant Quality Rating',
         data: data.quality,
-        color: '#3b82f6'
+        color: '#0077B6'
       },
       {
         name: 'Plan Compliance',
         data: data.compliance,
-        color: '#f59e0b'
+        color: '#EA8600'
       }
     ],
     credits: {

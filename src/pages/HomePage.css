@@ -1,27 +1,60 @@
 .homepage-container {
   min-height: 100vh;
+  width: 100%;
   background: #f9fafb;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
 }
 
-/* Navbar Styles */
+/* Top Navbar */
 .homepage-navbar {
-  background: white;
+  background: #FFFFFF;
   padding: 16px 32px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+  border-bottom: 1px solid #E4E4E4;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.homepage-navbar-left {
+  display: flex;
   align-items: center;
 }
 
 .homepage-navbar-title {
-  font-size: 24px;
-  font-weight: bold;
-  color: #1f2937;
+  font-size: 20px;
+  font-weight: 600;
+  color: #404040;
   margin: 0;
 }
 
+.homepage-navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.homepage-user-info {
+  font-size: 14px;
+  color: #404040;
+  padding: 8px 12px;
+  background: #f9fafb;
+  border-radius: 6px;
+}
+
+.homepage-user-info strong {
+  color: #0077B6;
+  font-weight: 600;
+}
+
 .homepage-logout-button {
-  padding: 8px 16px;
+  padding: 8px 20px;
   background: #ef4444;
   color: white;
   border: none;
@@ -29,44 +62,165 @@
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0px 2px 4px rgba(239, 68, 68, 0.2);
 }
 
 .homepage-logout-button:hover {
   background: #dc2626;
+  box-shadow: 0px 3px 6px rgba(239, 68, 68, 0.3);
 }
 
-/* Main Content Styles */
+.homepage-logout-button:active {
+  transform: translateY(1px);
+  box-shadow: 0px 1px 2px rgba(239, 68, 68, 0.2);
+}
+
+/* Main Content */
 .homepage-content {
   padding: 32px;
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 }
 
-/* Welcome Section */
-.homepage-welcome {
-  margin-bottom: 32px;
+.homepage-header {
+  margin-bottom: 0px;
 }
 
-.homepage-welcome-title {
+.homepage-title {
   font-size: 28px;
   font-weight: bold;
   color: #1f2937;
-  margin: 0 0 8px 0;
-}
-
-.homepage-welcome-subtitle {
-  font-size: 16px;
-  color: #6b7280;
   margin: 0;
+  text-align: left;
 }
 
-/* Charts Grid */
-.homepage-charts-grid {
-  display: grid;
+.homepage-first-row {
+  display: flex;
+  flex-wrap: wrap;
   gap: 20px;
-  grid-template-columns: repeat(5, 1fr);
-  margin-bottom: 24px;
+  width: 100%;
 }
 
-/* Monthly Summary Section */
-.homepage-monthly-section {
-  margin-top: 24px;
+.homepage-bar-chart-card {
+  height: 216px;
+  width: 364px;
+  border: 1px solid #E4E4E4;
+  border-radius: 16px;
+  background: white;
+  flex-shrink: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.homepage-doughnut-card {
+  width: 192px;
+  height: 216px;
+  border: 1px solid #E4E4E4;
+  border-radius: 16px;
+  background: white;
+  flex-shrink: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.homepage-violation-card {
+  width: 356px;
+  height: 216px;
+  border: 1px solid #E4E4E4;
+  border-radius: 16px;
+  background: white;
+  flex-shrink: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.homepage-second-row {
+  display: flex;
+  width: 100%;
+}
+
+.homepage-line-chart-card {
+  width: 100%;
+  max-width: 1392px;
+  height: 216px;
+  border: 1px solid #E4E4E4;
+  border-radius: 16px;
+  background: white;
+  overflow: hidden;
+  position: relative;
+}
+
+@media (max-width: 1440px) {
+  .homepage-first-row {
+    justify-content: flex-start;
+  }
+  
+  .homepage-line-chart-card {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 1200px) {
+  .homepage-first-row {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 768px) {
+  .homepage-navbar {
+    padding: 12px 16px;
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+  }
+
+  .homepage-navbar-left {
+    justify-content: center;
+  }
+
+  .homepage-navbar-title {
+    font-size: 16px;
+    text-align: center;
+  }
+
+  .homepage-navbar-right {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .homepage-user-info {
+    font-size: 13px;
+    padding: 6px 10px;
+  }
+
+  .homepage-content {
+    padding: 16px;
+  }
+  
+  .homepage-bar-chart-card,
+  .homepage-doughnut-card,
+  .homepage-violation-card,
+  .homepage-line-chart-card {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .homepage-navbar-right {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .homepage-user-info,
+  .homepage-logout-button {
+    width: 100%;
+    text-align: center;
+  }
 }

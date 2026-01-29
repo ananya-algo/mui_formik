@@ -3,23 +3,28 @@ import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import './Piechart.css';
 
-const PieChart = ({ percentage, label, color = '#4ade80' }) => {
+const PieChart = ({ percentage, label, color = '#34A853' }) => {
   const chartOptions = {
     chart: {
       type: 'pie',
-      height: 200,
-      backgroundColor: 'transparent'
+      height: 145,
+      width: 145,
+      backgroundColor: 'transparent',
+      spacing: [0, 0, 0, 0],
+      margin: [0, 0, 0, 0]
     },
     title: {
       text: `${percentage}%`,
       align: 'center',
       verticalAlign: 'middle',
       style: {
-        fontSize: '24px',
+        fontSize: '11px',
         fontWeight: 'bold',
-        color: '#1f2937'
+        color: '#34A853',
+        lineHeight: '11px'
       },
-      y: 5
+      y: 2,
+      x: 0
     },
     tooltip: {
       enabled: false
@@ -35,14 +40,16 @@ const PieChart = ({ percentage, label, color = '#4ade80' }) => {
           hover: {
             enabled: false
           }
-        }
+        },
+        borderWidth: 0,
+        center: ['50%', '50%']
       }
     },
     series: [{
       name: 'Percentage',
       data: [
         { y: percentage, color: color },
-        { y: 100 - percentage, color: '#e5e7eb' }
+        { y: 100 - percentage, color: '#E5E7EB' }
       ]
     }],
     credits: {
