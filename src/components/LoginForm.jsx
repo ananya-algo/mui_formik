@@ -78,8 +78,9 @@ const LoginForm = ({ onLogin }) => {
               {({ values, errors, touched, handleChange, handleBlur, handleSubmit, isSubmitting }) => (
                 <form onSubmit={handleSubmit} className="login-form">
                   <div className="form-field">
-                    <label className="field-label">SAP ID</label>
+                    <label htmlFor="sapId" className="field-label">SAP ID</label>
                     <input
+                      id="sapId"
                       type="text"
                       name="sapId"
                       className={`sap-input ${touched.sapId && errors.sapId ? 'error' : ''}`}
