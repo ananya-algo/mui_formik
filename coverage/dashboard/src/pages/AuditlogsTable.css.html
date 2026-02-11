@@ -3,15 +3,15 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for pages/HomePage.css</title>
+    <title>Code coverage report for dashboard/src/pages/AuditlogsTable.css</title>
     <meta charset="utf-8" />
-    <link rel="stylesheet" href="../prettify.css" />
-    <link rel="stylesheet" href="../base.css" />
-    <link rel="shortcut icon" type="image/x-icon" href="../favicon.png" />
+    <link rel="stylesheet" href="../../../prettify.css" />
+    <link rel="stylesheet" href="../../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../../favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style type='text/css'>
         .coverage-summary .sorter {
-            background-image: url(../sort-arrow-sprite.png);
+            background-image: url(../../../sort-arrow-sprite.png);
         }
     </style>
 </head>
@@ -19,7 +19,7 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../index.html">All files</a> / <a href="index.html">pages</a> HomePage.css</h1>
+        <h1><a href="../../../index.html">All files</a> / <a href="index.html">dashboard/src/pages</a> AuditlogsTable.css</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
@@ -276,19 +276,7 @@
 <a name='L211'></a><a href='#L211'>211</a>
 <a name='L212'></a><a href='#L212'>212</a>
 <a name='L213'></a><a href='#L213'>213</a>
-<a name='L214'></a><a href='#L214'>214</a>
-<a name='L215'></a><a href='#L215'>215</a>
-<a name='L216'></a><a href='#L216'>216</a>
-<a name='L217'></a><a href='#L217'>217</a>
-<a name='L218'></a><a href='#L218'>218</a>
-<a name='L219'></a><a href='#L219'>219</a>
-<a name='L220'></a><a href='#L220'>220</a>
-<a name='L221'></a><a href='#L221'>221</a>
-<a name='L222'></a><a href='#L222'>222</a>
-<a name='L223'></a><a href='#L223'>223</a>
-<a name='L224'></a><a href='#L224'>224</a>
-<a name='L225'></a><a href='#L225'>225</a>
-<a name='L226'></a><a href='#L226'>226</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L214'></a><a href='#L214'>214</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -501,243 +489,219 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">.homepage-container {
-  min-height: 100vh;
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">&nbsp;
+&nbsp;
+.audit-logs-container {
+  padding: 24px;
   width: 100%;
-  background: #f9fafb;
-  display: flex;
-  flex-direction: column;
-  overflow-x: hidden;
 }
 &nbsp;
-/* Top Navbar */
-.homepage-navbar {
-  background: #FFFFFF;
-  padding: 16px 32px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+.table-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-shrink: 0;
-  border-bottom: 1px solid #E4E4E4;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-&nbsp;
-.homepage-navbar-left {
-  display: flex;
-  align-items: center;
-}
-&nbsp;
-.homepage-navbar-title {
-  font-size: 20px;
-  font-weight: 600;
-  color: #404040;
-  margin: 0;
-}
-&nbsp;
-.homepage-navbar-right {
-  display: flex;
-  align-items: center;
+  margin-bottom: 20px;
   gap: 16px;
+  flex-wrap: wrap;
 }
 &nbsp;
-.homepage-user-info {
-  font-size: 14px;
-  color: #404040;
-  padding: 8px 12px;
-  background: #f9fafb;
-  border-radius: 6px;
-}
-&nbsp;
-.homepage-user-info strong {
-  color: #0077B6;
-  font-weight: 600;
-}
-&nbsp;
-.homepage-logout-button {
-  padding: 8px 20px;
-  background: #ef4444;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0px 2px 4px rgba(239, 68, 68, 0.2);
-}
-&nbsp;
-.homepage-logout-button:hover {
-  background: #dc2626;
-  box-shadow: 0px 3px 6px rgba(239, 68, 68, 0.3);
-}
-&nbsp;
-.homepage-logout-button:active {
-  transform: translateY(1px);
-  box-shadow: 0px 1px 2px rgba(239, 68, 68, 0.2);
-}
-&nbsp;
-/* Main Content */
-.homepage-content {
-  padding: 32px;
-  width: 100%;
-  max-width: 1440px;
-  margin: 0 auto;
-  box-sizing: border-box;
+.header-left {
   display: flex;
-  flex-direction: column;
-  gap: 24px;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
 }
 &nbsp;
-.homepage-header {
-  margin-bottom: 0px;
+.header-right {
+  display: flex;
+  gap: 12px;
+  align-items: center;
 }
 &nbsp;
-.homepage-title {
-  font-size: 28px;
-  font-weight: bold;
-  color: #1f2937;
-  margin: 0;
+.search-input {
+  min-width: 250px;
+}
+&nbsp;
+.table-wrapper {
+  background: transparent;
+  border: 1px solid #E4E4E4;
+  border-radius: 16px;
+  overflow: hidden;
+}
+&nbsp;
+.audit-table {
+  background: transparent;
+}
+&nbsp;
+.audit-table .MuiTableHead-root {
+  background-color: rgba(64, 64, 64, 0.1);
+}
+&nbsp;
+&nbsp;
+.audit-table .MuiTableHead-root .MuiTableCell-root {
+  color: #404040;
+  font-weight: 600;
+  border-bottom: 1px solid #E4E4E4;
+  border-right: 1px solid #E4E4E4;
+  padding: 16px;
+  white-space: nowrap;
+  opacity: 1;
+}
+&nbsp;
+.audit-table .MuiTableBody-root .MuiTableRow-root:nth-of-type(odd) {
+  background: #FFFFFF;
+}
+&nbsp;
+.audit-table .MuiTableBody-root .MuiTableRow-root:nth-of-type(even) {
+  background: rgba(0, 119, 182, 0.1);
+}
+&nbsp;
+.audit-table .MuiTableBody-root .MuiTableCell-root {
+  color: #404040;
+  border-bottom: 1px solid #E4E4E4;
+  border-right: 1px solid #E4E4E4;
+  padding: 12px 16px;
+}
+&nbsp;
+&nbsp;
+.audit-table .MuiTableBody-root .MuiTableCell-root:nth-child(2) {
   text-align: left;
 }
 &nbsp;
-.homepage-first-row {
+&nbsp;
+.audit-table .MuiTableHead-root .MuiTableCell-root:nth-child(2) {
+  text-align: left;
+}
+&nbsp;
+&nbsp;
+.audit-table .MuiTableBody-root .MuiTableCell-root:nth-child(6) {
+  text-align: left;
+}
+&nbsp;
+&nbsp;
+.audit-table .MuiTableHead-root .MuiTableCell-root:nth-child(6) {
+  text-align: left;
+}
+&nbsp;
+&nbsp;
+.audit-table .MuiTableBody-root .MuiTableCell-root:nth-child(7) {
+  text-align: left;
+}
+&nbsp;
+&nbsp;
+.audit-table .MuiTableHead-root .MuiTableCell-root:nth-child(7) {
+  text-align: left;
+}
+&nbsp;
+.action-icon {
+  cursor: pointer;
+  color: #0077B6;
+  transition: transform 0.2s;
+}
+&nbsp;
+.action-icon:hover {
+  transform: translateX(4px);
+}
+&nbsp;
+/* Sort Panel */
+.sort-panel {
+  width: 360px;
+  height: 272px;
+  background: #FFFFFF;
+  box-shadow: -3px 0px 36px #0000007A;
+  border-radius: 16px;
+  padding: 24px;
+}
+&nbsp;
+.sort-panel-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #404040;
+  margin-bottom: 20px;
+}
+&nbsp;
+.sort-panel-content {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 20px;
-  width: 100%;
 }
 &nbsp;
-.homepage-bar-chart-card {
-  height: 216px;
-  width: 364px;
-  border: 1px solid #E4E4E4;
-  border-radius: 16px;
-  background: white;
-  flex-shrink: 0;
-  overflow: hidden;
-  position: relative;
-}
-&nbsp;
-.homepage-doughnut-card {
-  width: 192px;
-  height: 216px;
-  border: 1px solid #E4E4E4;
-  border-radius: 16px;
-  background: white;
-  flex-shrink: 0;
-  overflow: hidden;
-  position: relative;
-}
-&nbsp;
-.homepage-violation-card {
-  width: 356px;
-  height: 216px;
-  border: 1px solid #E4E4E4;
-  border-radius: 16px;
-  background: white;
-  flex-shrink: 0;
-  overflow: hidden;
-  position: relative;
-}
-&nbsp;
-.homepage-second-row {
+.sort-panel-actions {
   display: flex;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 20px;
+}
+&nbsp;
+/* Filter Popup */
+.filter-popup {
+  width: 200px;
+  min-height: 240px;
+  background: #FFFFFF;
+  box-shadow: 0px 0px 6px #0000003D;
+  border-radius: 4px;
+  padding: 16px;
+}
+&nbsp;
+.filter-popup-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #404040;
+  margin-bottom: 12px;
+}
+&nbsp;
+.filter-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+&nbsp;
+.filter-option {
+  display: flex;
+  align-items: center;
+}
+&nbsp;
+.filter-option label {
+  color: #404040;
+  font-size: 14px;
+}
+&nbsp;
+.score-range {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+&nbsp;
+.score-range-input {
   width: 100%;
 }
 &nbsp;
-.homepage-line-chart-card {
-  width: 100%;
-  max-width: 1392px;
-  height: 216px;
+.pagination-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+  padding: 12px 16px;
+  background: #FFFFFF;
   border: 1px solid #E4E4E4;
-  border-radius: 16px;
-  background: white;
-  overflow: hidden;
-  position: relative;
+  border-radius: 8px;
 }
 &nbsp;
-@media (max-width: 1440px) {
-  .homepage-first-row {
-    justify-content: flex-start;
-  }
-  
-  .homepage-line-chart-card {
-    max-width: 100%;
-  }
+.pagination-info {
+  color: #404040;
+  font-size: 14px;
 }
 &nbsp;
-@media (max-width: 1200px) {
-  .homepage-first-row {
-    flex-wrap: wrap;
-  }
+.page-size-selector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 &nbsp;
-@media (max-width: 768px) {
-  .homepage-navbar {
-    padding: 12px 16px;
-    flex-direction: column;
-    gap: 12px;
-    align-items: stretch;
-  }
-&nbsp;
-  .homepage-navbar-left {
-    justify-content: center;
-  }
-&nbsp;
-  .homepage-navbar-title {
-    font-size: 16px;
-    text-align: center;
-  }
-&nbsp;
-  .homepage-navbar-right {
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-&nbsp;
-  .homepage-user-info {
-    font-size: 13px;
-    padding: 6px 10px;
-  }
-&nbsp;
-  .homepage-content {
-    padding: 16px;
-  }
-  
-  .homepage-bar-chart-card,
-  .homepage-doughnut-card,
-  .homepage-violation-card,
-  .homepage-line-chart-card {
-    width: 100%;
-    max-width: 100%;
-  }
-}
-&nbsp;
-@media (max-width: 480px) {
-  .homepage-navbar-right {
-    flex-direction: column;
-    width: 100%;
-  }
-&nbsp;
-  .homepage-user-info,
-  .homepage-logout-button {
-    width: 100%;
-    text-align: center;
-  }
+.page-size-selector label {
+  color: #404040;
+  font-size: 14px;
 }</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -745,16 +709,16 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-02-05T10:23:26.923Z
+                at 2026-02-11T06:12:32.930Z
             </div>
-        <script src="../prettify.js"></script>
+        <script src="../../../prettify.js"></script>
         <script>
             window.onload = function () {
                 prettyPrint();
             };
         </script>
-        <script src="../sorter.js"></script>
-        <script src="../block-navigation.js"></script>
+        <script src="../../../sorter.js"></script>
+        <script src="../../../block-navigation.js"></script>
     </body>
 </html>
     

@@ -156,12 +156,10 @@ describe('LoginForm Component', () => {
 
     await user.type(input, '12345678');
     
-    // Click submit - this will trigger the async operation
+   
     const submitPromise = user.click(submitButton);
 
-    // Check if button is disabled immediately after click
-    // Note: Due to Formik's fast execution, this might be hard to catch
-    // The button will be disabled only during the brief moment of submission
+   
     await waitFor(() => {
       expect(slowOnLogin).toHaveBeenCalled();
     });
