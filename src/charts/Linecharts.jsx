@@ -3,99 +3,74 @@ import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import './Linecharts.css';
 
+const toNumberArray = (arr) =>
+  Array.isArray(arr) ? arr.map(v => (isFinite(Number(v)) ? Number(v) : 0)) : [];
+
 const LineChart = ({ data, title }) => {
+  const categories = Array.isArray(data?.categories) ? data.categories : [];
+  const quality    = toNumberArray(data?.quality);
+  const compliance = toNumberArray(data?.compliance);
+
+  // ✅ Don't render at all if no data
+  if (!categories.length) return null;
+
   const chartOptions = {
     chart: {
       type: 'line',
       height: 140,
       backgroundColor: 'transparent',
-      spacing: [10, 10, 10, 10]
+      spacing: [10, 10, 10, 10],
     },
-    title: {
-      text: null
-    },
+    title: { text: null },
     xAxis: {
-      categories: data.categories,
+      categories,
       lineColor: '#D1D5DB',
       lineWidth: 1,
       tickColor: '#D1D5DB',
       tickWidth: 1,
-      visible: true,
-      labels: {
-        style: {
-          fontSize: '9px',
-          color: '#6B7280'
-        }
-      }
+      labels: { style: { fontSize: '9px', color: '#6B7280' } },
     },
     yAxis: {
-      title: {
-        text: null
-      },
+      title: { text: null },
       min: 80,
       max: 100,
       tickInterval: 5,
       gridLineColor: '#E5E7EB',
       gridLineWidth: 1,
-      lineColor: '#D1D5DB',
-      lineWidth: 1,
-      visible: true,
       labels: {
-        style: {
-          fontSize: '9px',
-          color: '#6B7280'
-        },
-        format: '{value}%'
+        style: { fontSize: '9px', color: '#6B7280' },
+        format: '{value}%',
       },
-      tickPositions: [80, 85, 90, 95, 100]
+      tickPositions: [80, 85, 90, 95, 100],
     },
-    legend: {
-      enabled: false
-    },
+    legend: { enabled: false },
     plotOptions: {
       line: {
-        marker: {
-          radius: 4,
-          enabled: true,
-          symbol: 'circle'
-        },
+        marker: { radius: 4, enabled: true, symbol: 'circle' },
         lineWidth: 2,
         dataLabels: {
           enabled: true,
-          style: {
-            fontSize: '9px',
-            fontWeight: 'normal',
-            textOutline: 'none'
-          },
-          format: '{y}%'
-        }
-      }
+          style: { fontSize: '9px', fontWeight: 'normal', textOutline: 'none' },
+          format: '{y}%',
+        },
+      },
     },
     series: [
       {
         name: 'Plant Quality Rating',
-        data: data.quality,
+        data: quality,
         color: '#0077B6',
-        dataLabels: {
-          color: '#0077B6'
-        }
+        dataLabels: { color: '#0077B6' },
       },
       {
         name: 'Plan Compliance',
-        data: data.compliance,
+        data: compliance,
         color: '#EA8600',
-        dataLabels: {
-          color: '#EA8600'
-        }
-      }
+        dataLabels: { color: '#EA8600' },
+      },
     ],
-    credits: {
-      enabled: false
-    },
-    tooltip: {
-      shared: true,
-      valueSuffix: '%'
-    }
+    credits: { enabled: false },
+    tooltip: { shared: true, valueSuffix: '%' },
   };
 
   return (
@@ -113,10 +88,7 @@ const LineChart = ({ data, title }) => {
           </span>
         </div>
       </div>
-      <HighchartsReact
-        highcharts={Highcharts}
-        options={chartOptions}
-      />
+      <HighchartsReact highcharts={Highcharts} options={chartOptions} />
     </div>
   );
 };

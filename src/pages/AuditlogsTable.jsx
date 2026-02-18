@@ -1,27 +1,10 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import axios from 'axios';
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  TextField,
-  Button,
-  Popover,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Checkbox,
-  IconButton,
-  TablePagination,
-  Box,
-  Typography,
-  InputAdornment,
-  Chip,
-  Stack
+  Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
+  Paper, TextField, Button, Popover, Select, MenuItem, FormControl,
+  InputLabel, Checkbox, IconButton, TablePagination, Box, Typography,
+  InputAdornment, Chip, Stack, CircularProgress
 } from '@mui/material';
 import {
   ArrowForward as ArrowForwardIcon,
@@ -29,527 +12,259 @@ import {
   Clear as ClearIcon,
   Search as SearchIcon
 } from '@mui/icons-material';
-import { auditLogsData } from '../data/mockData';
 import './AuditLogsTable.css';
 
 const AuditLogsTable = () => {
-  // Column configuration 
   const columns = [
-    { id: 'timestamp', label: 'Timestamp', align: 'left', filterable: false },
-    { id: 'shift', label: 'Shift', align: 'left', filterable: true, filterType: 'select' },
-    { id: 'score', label: 'Score', align: 'center', filterable: false },
-    { id: 'auditor', label: 'Auditor', align: 'left', filterable: true, filterType: 'text' },
-    { id: 'auditee', label: 'Auditee', align: 'left', filterable: true, filterType: 'text' },
-    { id: 'normalViolations', label: 'Normal Violations', align: 'left', filterable: false },
-    { id: 'severeViolations', label: 'Severe Violations', align: 'left', filterable: false },
-    { id: 'machinesAudited', label: 'Machines Audited', align: 'left', filterable: true, filterType: 'machines' },
-    { id: 'action', label: 'Action', align: 'center', filterable: false }
+    { id: 'timestamp',        label: 'Timestamp',         align: 'left',   filterable: false },
+    { id: 'shift',            label: 'Shift',             align: 'left',   filterable: true, filterType: 'select' },
+    { id: 'score',            label: 'Score',             align: 'center', filterable: false },
+    { id: 'auditor',          label: 'Auditor',           align: 'left',   filterable: true, filterType: 'text' },
+    { id: 'auditee',          label: 'Auditee',           align: 'left',   filterable: true, filterType: 'text' },
+    { id: 'normalViolations', label: 'Normal Violations', align: 'left',   filterable: false },
+    { id: 'severeViolations', label: 'Severe Violations', align: 'left',   filterable: false },
+    { id: 'machinesAudited',  label: 'Machines Audited',  align: 'left',   filterable: true, filterType: 'machines' },
+    { id: 'action',           label: 'Action',            align: 'center', filterable: false },
   ];
 
-  // State for search
-  const [searchTerm, setSearchTerm] = useState('');
+  // ── Data state ───────────────────────────────
+  const [rows,         setRows]         = useState([]);
+  const [total,        setTotal]        = useState(0);
+  const [loading,      setLoading]      = useState(true);
+  const [error,        setError]        = useState(null);
 
-  // State for sort control
-  const [sortBy, setSortBy] = useState('timestamp-desc');
+  // ── Filter options from API ──────────────────
+  const [uniqueShifts,   setUniqueShifts]   = useState([]);
+  const [uniqueAuditors, setUniqueAuditors] = useState([]);
+  const [uniqueAuditees, setUniqueAuditees] = useState([]);
+  const [uniqueMachines, setUniqueMachines] = useState([]);
 
-  // State for column-level filters
-  const [columnFilterAnchor, setColumnFilterAnchor] = useState(null);
-  const [activeFilterColumn, setActiveFilterColumn] = useState(null);
-  const [columnFilters, setColumnFilters] = useState({
+  // ── UI state ─────────────────────────────────
+  const [searchTerm,           setSearchTerm]           = useState('');
+  const [sortBy,               setSortBy]               = useState('timestamp-desc');
+  const [page,                 setPage]                 = useState(0);
+  const [rowsPerPage,          setRowsPerPage]          = useState(10);
+  const [columnFilterAnchor,   setColumnFilterAnchor]   = useState(null);
+  const [activeFilterColumn,   setActiveFilterColumn]   = useState(null);
+  const [columnFilters,        setColumnFilters]        = useState({
     shift: [],
     auditor: '',
     auditee: '',
     machinesAudited: { min: '', max: '', specific: [] }
   });
 
-  // State for pagination
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-
-  // Get unique values for filters
-  const uniqueShifts = useMemo(() => 
-    [...new Set(auditLogsData.map(log => log.shift))].sort(),
-    []
-  );
-
-  const uniqueAuditors = useMemo(() =>
-    [...new Set(auditLogsData.map(log => log.auditor))].sort(),
-    []
-  );
-
-  const uniqueAuditees = useMemo(() =>
-    [...new Set(auditLogsData.map(log => log.auditee))].sort(),
-    []
-  );
-
-  const uniqueMachines = useMemo(() => {
-    const allMachines = auditLogsData.flatMap(log => log.machinesAudited);
-    return [...new Set(allMachines)].sort((a, b) => a - b);
+  // ── Fetch filter options once on mount ───────
+  useEffect(() => {
+    const fetchFilterOptions = async () => {
+      try {
+        const response = await axios.get('http://localhost:4000/api/audits/filters', {
+          headers: { 'Content-Type': 'application/json' }
+        });
+        if (response.data?.success) {
+          const { shifts, auditors, auditees, machines } = response.data.data;
+          setUniqueShifts(shifts);
+          setUniqueAuditors(auditors);
+          setUniqueAuditees(auditees);
+          setUniqueMachines(machines);
+        }
+      } catch (err) {
+        console.error('Failed to load filter options:', err.response?.data?.message || err.message);
+      }
+    };
+    fetchFilterOptions();
   }, []);
 
-  // Handle column filter click
-  const handleColumnFilterClick = (event, columnId) => {
-    setColumnFilterAnchor(event.currentTarget);
-    setActiveFilterColumn(columnId);
-  };
+  // ── Fetch audit logs whenever filters/sort/page change ──
+  const fetchAuditLogs = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
 
-  const handleColumnFilterClose = () => {
-    setColumnFilterAnchor(null);
-    setActiveFilterColumn(null);
-  };
+      const [sortColumn, sortDir] = sortBy.split('-');
 
-  // Handle column filter changes
-  const handleShiftFilterToggle = (shift) => {
-    setColumnFilters(prev => ({
-      ...prev,
-      shift: prev.shift.includes(shift)
-        ? prev.shift.filter(s => s !== shift)
-        : [...prev.shift, shift]
-    }));
-  };
+      const response = await axios.get('http://localhost:4000/api/audits', {
+        headers: { 'Content-Type': 'application/json' },
+        params: {
+          page:       page + 1,   // API is 1-based, MUI is 0-based
+          limit:      rowsPerPage,
+          sortBy:     sortColumn,
+          sortDir,
+          search:     searchTerm,
+          shift:      columnFilters.shift.join(','),
+          auditor:    columnFilters.auditor,
+          auditee:    columnFilters.auditee,
+          machineMin: columnFilters.machinesAudited.min,
+          machineMax: columnFilters.machinesAudited.max,
+          machines:   columnFilters.machinesAudited.specific.join(','),
+        }
+      });
 
-  const handleAuditorFilterChange = (value) => {
-    setColumnFilters(prev => ({
-      ...prev,
-      auditor: value
-    }));
-  };
-
-  const handleAuditeeFilterChange = (value) => {
-    setColumnFilters(prev => ({
-      ...prev,
-      auditee: value
-    }));
-  };
-
-  const handleMachineFilterToggle = (machine) => {
-    setColumnFilters(prev => ({
-      ...prev,
-      machinesAudited: {
-        ...prev.machinesAudited,
-        specific: prev.machinesAudited.specific.includes(machine)
-          ? prev.machinesAudited.specific.filter(m => m !== machine)
-          : [...prev.machinesAudited.specific, machine]
+      if (response.data?.success) {
+        setRows(response.data.data);
+        setTotal(response.data.total);
+      } else {
+        setError(response.data?.message || 'Failed to load audit logs.');
       }
-    }));
-  };
 
-  const handleMachineRangeChange = (type, value) => {
-    setColumnFilters(prev => ({
-      ...prev,
-      machinesAudited: {
-        ...prev.machinesAudited,
-        [type]: value
-      }
-    }));
-  };
-
-  const clearColumnFilter = (columnId) => {
-    switch (columnId) {
-      case 'shift':
-        setColumnFilters(prev => ({ ...prev, shift: [] }));
-        break;
-      case 'auditor':
-        setColumnFilters(prev => ({ ...prev, auditor: '' }));
-        break;
-      case 'auditee':
-        setColumnFilters(prev => ({ ...prev, auditee: '' }));
-        break;
-      case 'machinesAudited':
-        setColumnFilters(prev => ({
-          ...prev,
-          machinesAudited: { min: '', max: '', specific: [] }
-        }));
-        break;
-      default:
-        break;
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to load audit logs. Please try again.');
+    } finally {
+      setLoading(false);
     }
-  };
+  }, [page, rowsPerPage, sortBy, searchTerm, columnFilters]);
 
-  const clearAllColumnFilters = () => {
-    setColumnFilters({
-      shift: [],
-      auditor: '',
-      auditee: '',
-      machinesAudited: { min: '', max: '', specific: [] }
-    });
-  };
+  useEffect(() => {
+    fetchAuditLogs();
+  }, [fetchAuditLogs]);
 
-  // Check if column has active filter
+  // Reset to page 0 when filters or search change
+  useEffect(() => {
+    setPage(0);
+  }, [searchTerm, columnFilters, sortBy]);
+
+  // ── Filter helpers ────────────────────────────
   const hasActiveFilter = (columnId) => {
     switch (columnId) {
-      case 'shift':
-        return columnFilters.shift.length > 0;
-      case 'auditor':
-        return columnFilters.auditor !== '';
-      case 'auditee':
-        return columnFilters.auditee !== '';
+      case 'shift':          return columnFilters.shift.length > 0;
+      case 'auditor':        return columnFilters.auditor !== '';
+      case 'auditee':        return columnFilters.auditee !== '';
       case 'machinesAudited':
         return columnFilters.machinesAudited.min !== '' ||
                columnFilters.machinesAudited.max !== '' ||
                columnFilters.machinesAudited.specific.length > 0;
-      default:
-        return false;
+      default: return false;
     }
   };
 
-  // Handle sort change
-  const handleSortChange = (event) => {
-    setSortBy(event.target.value);
-  };
-
-  // Filter and sort data
-  const filteredAndSortedData = useMemo(() => {
-    let data = [...auditLogsData];
-
-    // Apply global search filter
-    if (searchTerm) {
-      const searchLower = searchTerm.toLowerCase();
-      data = data.filter(log =>
-        log.auditor.toLowerCase().includes(searchLower) ||
-        log.auditee.toLowerCase().includes(searchLower) ||
-        log.machinesAudited.join(', ').includes(searchTerm) ||
-        log.timestamp.toLowerCase().includes(searchLower) ||
-        log.shift.toLowerCase().includes(searchLower)
-      );
-    }
-
-    // Apply column-level filters
-    // Shift filter
-    if (columnFilters.shift.length > 0) {
-      data = data.filter(log => columnFilters.shift.includes(log.shift));
-    }
-
-    // Auditor filter
-    if (columnFilters.auditor) {
-      const auditorLower = columnFilters.auditor.toLowerCase();
-      data = data.filter(log => log.auditor.toLowerCase().includes(auditorLower));
-    }
-
-    // Auditee filter
-    if (columnFilters.auditee) {
-      const auditeeLower = columnFilters.auditee.toLowerCase();
-      data = data.filter(log => log.auditee.toLowerCase().includes(auditeeLower));
-    }
-
-    // Machines Audited filter
-    if (columnFilters.machinesAudited.specific.length > 0) {
-      data = data.filter(log =>
-        log.machinesAudited.some(machine =>
-          columnFilters.machinesAudited.specific.includes(machine)
-        )
-      );
-    }
-
-    if (columnFilters.machinesAudited.min !== '') {
-      const minMachine = parseInt(columnFilters.machinesAudited.min);
-      data = data.filter(log =>
-        log.machinesAudited.some(machine => machine >= minMachine)
-      );
-    }
-
-    if (columnFilters.machinesAudited.max !== '') {
-      const maxMachine = parseInt(columnFilters.machinesAudited.max);
-      data = data.filter(log =>
-        log.machinesAudited.some(machine => machine <= maxMachine)
-      );
-    }
-
-    // Apply sorting based on sortBy value
-    const [sortColumn, sortDirection] = sortBy.split('-');
-    
-    data.sort((a, b) => {
-      let aValue, bValue;
-
-      switch (sortColumn) {
-        case 'timestamp':
-          aValue = new Date(a.timestamp);
-          bValue = new Date(b.timestamp);
-          break;
-        case 'score':
-          aValue = a.score;
-          bValue = b.score;
-          break;
-        case 'shift':
-          aValue = a.shift;
-          bValue = b.shift;
-          break;
-        case 'auditor':
-          aValue = a.auditor.toLowerCase();
-          bValue = b.auditor.toLowerCase();
-          break;
-        case 'auditee':
-          aValue = a.auditee.toLowerCase();
-          bValue = b.auditee.toLowerCase();
-          break;
-        default:
-          return 0;
-      }
-
-      if (sortDirection === 'asc') {
-        return aValue > bValue ? 1 : aValue < bValue ? -1 : 0;
-      } else {
-        return aValue < bValue ? 1 : aValue > bValue ? -1 : 0;
+  const clearColumnFilter = (columnId) => {
+    setColumnFilters(prev => {
+      switch (columnId) {
+        case 'shift':          return { ...prev, shift: [] };
+        case 'auditor':        return { ...prev, auditor: '' };
+        case 'auditee':        return { ...prev, auditee: '' };
+        case 'machinesAudited': return { ...prev, machinesAudited: { min: '', max: '', specific: [] } };
+        default: return prev;
       }
     });
-
-    return data;
-  }, [searchTerm, sortBy, columnFilters]);
-
-  // Paginate data
-  const paginatedData = useMemo(() => {
-    const startIndex = page * rowsPerPage;
-    return filteredAndSortedData.slice(startIndex, startIndex + rowsPerPage);
-  }, [filteredAndSortedData, page, rowsPerPage]);
-
-  // Handle pagination
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
   };
 
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
+  const clearAllColumnFilters = () => {
+    setColumnFilters({ shift: [], auditor: '', auditee: '', machinesAudited: { min: '', max: '', specific: [] } });
   };
 
-  const handleActionClick = (log) => {
-    console.log('Action clicked for:', log);
+  const handleColumnFilterClick  = (e, columnId) => { setColumnFilterAnchor(e.currentTarget); setActiveFilterColumn(columnId); };
+  const handleColumnFilterClose  = () => { setColumnFilterAnchor(null); setActiveFilterColumn(null); };
+  const handleShiftFilterToggle  = (shift) => setColumnFilters(prev => ({ ...prev, shift: prev.shift.includes(shift) ? prev.shift.filter(s => s !== shift) : [...prev.shift, shift] }));
+  const handleAuditorFilterChange = (val) => setColumnFilters(prev => ({ ...prev, auditor: val }));
+  const handleAuditeeFilterChange = (val) => setColumnFilters(prev => ({ ...prev, auditee: val }));
+  const handleMachineFilterToggle = (m) => setColumnFilters(prev => ({ ...prev, machinesAudited: { ...prev.machinesAudited, specific: prev.machinesAudited.specific.includes(m) ? prev.machinesAudited.specific.filter(x => x !== m) : [...prev.machinesAudited.specific, m] } }));
+  const handleMachineRangeChange  = (type, val) => setColumnFilters(prev => ({ ...prev, machinesAudited: { ...prev.machinesAudited, [type]: val } }));
+
+  const handleActionClick = async (log) => {
+    try {
+      const response = await axios.get(`http://localhost:4000/api/audits/${log.id}`, {
+        headers: { 'Content-Type': 'application/json' }
+      });
+      if (response.data?.success) {
+        console.log('Audit detail:', response.data.data);
+        // TODO: open a detail modal/drawer here
+      }
+    } catch (err) {
+      console.error('Failed to fetch audit detail:', err.response?.data?.message || err.message);
+    }
   };
 
-  const columnFilterOpen = Boolean(columnFilterAnchor);
-
-  // Render column filter content based on column type
+  // ── Render column filter popover ─────────────
   const renderColumnFilter = () => {
-    if (!activeFilterColumn) return null;
-
     switch (activeFilterColumn) {
       case 'shift':
         return (
           <Box sx={{ p: 2, minWidth: 200 }}>
-            <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600 }}>
-              Filter by Shift
-            </Typography>
+            <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600 }}>Filter by Shift</Typography>
             {uniqueShifts.map(shift => (
               <Box key={shift} sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                <Checkbox
-                  checked={columnFilters.shift.includes(shift)}
-                  onChange={() => handleShiftFilterToggle(shift)}
-                  size="small"
-                />
+                <Checkbox checked={columnFilters.shift.includes(shift)} onChange={() => handleShiftFilterToggle(shift)} size="small" />
                 <Typography variant="body2">Shift {shift}</Typography>
               </Box>
             ))}
-            <Button
-              size="small"
-              onClick={() => clearColumnFilter('shift')}
-              startIcon={<ClearIcon />}
-              sx={{ mt: 1 }}
-              fullWidth
-            >
-              Clear
-            </Button>
+            <Button size="small" onClick={() => clearColumnFilter('shift')} startIcon={<ClearIcon />} sx={{ mt: 1 }} fullWidth>Clear</Button>
           </Box>
         );
 
       case 'auditor':
         return (
           <Box sx={{ p: 2, minWidth: 250 }}>
-            <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600 }}>
-              Filter by Auditor
-            </Typography>
-            <TextField
-              fullWidth
-              size="small"
-              placeholder="Type auditor name..."
-              value={columnFilters.auditor}
-              onChange={(e) => handleAuditorFilterChange(e.target.value)}
-              sx={{ mb: 2 }}
-            />
-            <Typography variant="caption" sx={{ mb: 1, display: 'block', color: 'text.secondary' }}>
-              Select from list:
-            </Typography>
+            <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600 }}>Filter by Auditor</Typography>
+            <TextField fullWidth size="small" placeholder="Type auditor name..." value={columnFilters.auditor} onChange={(e) => handleAuditorFilterChange(e.target.value)} sx={{ mb: 2 }} />
+            <Typography variant="caption" sx={{ mb: 1, display: 'block', color: 'text.secondary' }}>Select from list:</Typography>
             <Box sx={{ maxHeight: 200, overflowY: 'auto' }}>
               {uniqueAuditors.map(auditor => (
-                <Box
-                  key={auditor}
-                  sx={{
-                    p: 1,
-                    cursor: 'pointer',
-                    borderRadius: 1,
-                    '&:hover': { bgcolor: 'action.hover' },
-                    bgcolor: columnFilters.auditor === auditor ? 'action.selected' : 'transparent'
-                  }}
-                  onClick={() => handleAuditorFilterChange(auditor)}
-                >
+                <Box key={auditor} sx={{ p: 1, cursor: 'pointer', borderRadius: 1, '&:hover': { bgcolor: 'action.hover' }, bgcolor: columnFilters.auditor === auditor ? 'action.selected' : 'transparent' }} onClick={() => handleAuditorFilterChange(auditor)}>
                   <Typography variant="body2">{auditor}</Typography>
                 </Box>
               ))}
             </Box>
-            <Button
-              size="small"
-              onClick={() => clearColumnFilter('auditor')}
-              startIcon={<ClearIcon />}
-              sx={{ mt: 2 }}
-              fullWidth
-            >
-              Clear
-            </Button>
+            <Button size="small" onClick={() => clearColumnFilter('auditor')} startIcon={<ClearIcon />} sx={{ mt: 2 }} fullWidth>Clear</Button>
           </Box>
         );
 
       case 'auditee':
         return (
           <Box sx={{ p: 2, minWidth: 250 }}>
-            <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600 }}>
-              Filter by Auditee
-            </Typography>
-            <TextField
-              fullWidth
-              size="small"
-              placeholder="Type auditee name..."
-              value={columnFilters.auditee}
-              onChange={(e) => handleAuditeeFilterChange(e.target.value)}
-              sx={{ mb: 2 }}
-            />
-            <Typography variant="caption" sx={{ mb: 1, display: 'block', color: 'text.secondary' }}>
-              Select from list:
-            </Typography>
+            <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600 }}>Filter by Auditee</Typography>
+            <TextField fullWidth size="small" placeholder="Type auditee name..." value={columnFilters.auditee} onChange={(e) => handleAuditeeFilterChange(e.target.value)} sx={{ mb: 2 }} />
+            <Typography variant="caption" sx={{ mb: 1, display: 'block', color: 'text.secondary' }}>Select from list:</Typography>
             <Box sx={{ maxHeight: 200, overflowY: 'auto' }}>
               {uniqueAuditees.map(auditee => (
-                <Box
-                  key={auditee}
-                  sx={{
-                    p: 1,
-                    cursor: 'pointer',
-                    borderRadius: 1,
-                    '&:hover': { bgcolor: 'action.hover' },
-                    bgcolor: columnFilters.auditee === auditee ? 'action.selected' : 'transparent'
-                  }}
-                  onClick={() => handleAuditeeFilterChange(auditee)}
-                >
+                <Box key={auditee} sx={{ p: 1, cursor: 'pointer', borderRadius: 1, '&:hover': { bgcolor: 'action.hover' }, bgcolor: columnFilters.auditee === auditee ? 'action.selected' : 'transparent' }} onClick={() => handleAuditeeFilterChange(auditee)}>
                   <Typography variant="body2">{auditee}</Typography>
                 </Box>
               ))}
             </Box>
-            <Button
-              size="small"
-              onClick={() => clearColumnFilter('auditee')}
-              startIcon={<ClearIcon />}
-              sx={{ mt: 2 }}
-              fullWidth
-            >
-              Clear
-            </Button>
+            <Button size="small" onClick={() => clearColumnFilter('auditee')} startIcon={<ClearIcon />} sx={{ mt: 2 }} fullWidth>Clear</Button>
           </Box>
         );
 
       case 'machinesAudited':
         return (
           <Box sx={{ p: 2, minWidth: 280 }}>
-            <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600 }}>
-              Filter by Machines
-            </Typography>
-            
-            <Typography variant="caption" sx={{ mb: 1, display: 'block', fontWeight: 500 }}>
-              Number Range:
-            </Typography>
+            <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600 }}>Filter by Machines</Typography>
+            <Typography variant="caption" sx={{ mb: 1, display: 'block', fontWeight: 500 }}>Number Range:</Typography>
             <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
-              <TextField
-                size="small"
-                type="number"
-                placeholder="Min"
-                value={columnFilters.machinesAudited.min}
-                onChange={(e) => handleMachineRangeChange('min', e.target.value)}
-                sx={{ flex: 1 }}
-              />
-              <TextField
-                size="small"
-                type="number"
-                placeholder="Max"
-                value={columnFilters.machinesAudited.max}
-                onChange={(e) => handleMachineRangeChange('max', e.target.value)}
-                sx={{ flex: 1 }}
-              />
+              <TextField size="small" type="number" placeholder="Min" value={columnFilters.machinesAudited.min} onChange={(e) => handleMachineRangeChange('min', e.target.value)} sx={{ flex: 1 }} />
+              <TextField size="small" type="number" placeholder="Max" value={columnFilters.machinesAudited.max} onChange={(e) => handleMachineRangeChange('max', e.target.value)} sx={{ flex: 1 }} />
             </Box>
-
-            <Typography variant="caption" sx={{ mb: 1, display: 'block', fontWeight: 500 }}>
-              Specific Machines:
-            </Typography>
+            <Typography variant="caption" sx={{ mb: 1, display: 'block', fontWeight: 500 }}>Specific Machines:</Typography>
             <Box sx={{ maxHeight: 200, overflowY: 'auto', mb: 2 }}>
               {uniqueMachines.map(machine => (
                 <Box key={machine} sx={{ display: 'flex', alignItems: 'center', mb: 0.5 }}>
-                  <Checkbox
-                    checked={columnFilters.machinesAudited.specific.includes(machine)}
-                    onChange={() => handleMachineFilterToggle(machine)}
-                    size="small"
-                  />
+                  <Checkbox checked={columnFilters.machinesAudited.specific.includes(machine)} onChange={() => handleMachineFilterToggle(machine)} size="small" />
                   <Typography variant="body2">Machine {machine}</Typography>
                 </Box>
               ))}
             </Box>
-
-            <Button
-              size="small"
-              onClick={() => clearColumnFilter('machinesAudited')}
-              startIcon={<ClearIcon />}
-              fullWidth
-            >
-              Clear
-            </Button>
+            <Button size="small" onClick={() => clearColumnFilter('machinesAudited')} startIcon={<ClearIcon />} fullWidth>Clear</Button>
           </Box>
         );
 
-      default:
-        return null;
+      default: return null;
     }
   };
 
+  const anyActiveFilter = ['shift','auditor','auditee','machinesAudited'].some(hasActiveFilter);
+
+  // ── Render ────────────────────────────────────
   return (
     <div className="audit-logs-container">
-      {/* Top Header Bar - Title on Left, Sort and Search on Right */}
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          mb: 3,
-          px: 1
-        }}
-      >
-        {/* Left: Title */}
-        <Typography
-          variant="h5"
-          sx={{
-            fontWeight: 700,
-            color: '#404040',
-            letterSpacing: '-0.5px'
-          }}
-        >
+      {/* Header */}
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, px: 1 }}>
+        <Typography variant="h5" sx={{ fontWeight: 700, color: '#404040', letterSpacing: '-0.5px' }}>
           Process Audit Logs
         </Typography>
-
-        {/* Right: Sort + Search */}
         <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-          {/* Sort Control */}
-          <FormControl
-            size="small"
-            sx={{
-              minWidth: 200,
-              '& .MuiOutlinedInput-root': {
-                borderRadius: '16px'
-              }
-            }}
-          >
+          <FormControl size="small" sx={{ minWidth: 200, '& .MuiOutlinedInput-root': { borderRadius: '16px' } }}>
             <InputLabel id="sort-label">Sort By</InputLabel>
-            <Select
-              labelId="sort-label"
-              value={sortBy}
-              label="Sort By"
-              onChange={handleSortChange}
-              sx={{
-                borderRadius: '16px'
-              }}
-            >
+            <Select labelId="sort-label" value={sortBy} label="Sort By" onChange={(e) => setSortBy(e.target.value)} sx={{ borderRadius: '16px' }}>
               <MenuItem value="timestamp-desc">Timestamp (Newest First)</MenuItem>
               <MenuItem value="timestamp-asc">Timestamp (Oldest First)</MenuItem>
               <MenuItem value="score-desc">Score (High to Low)</MenuItem>
@@ -562,19 +277,12 @@ const AuditLogsTable = () => {
               <MenuItem value="auditee-desc">Auditee (Z to A)</MenuItem>
             </Select>
           </FormControl>
-
-          {/* Search Bar with Icon */}
           <TextField
             size="small"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            sx={{
-              minWidth: 300,
-              '& .MuiOutlinedInput-root': {
-                borderRadius: '16px',
-                paddingLeft: '8px'
-              }
-            }}
+            placeholder="Search..."
+            sx={{ minWidth: 300, '& .MuiOutlinedInput-root': { borderRadius: '16px', paddingLeft: '8px' } }}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -586,97 +294,55 @@ const AuditLogsTable = () => {
         </Box>
       </Box>
 
-      {/* Clear Column Filters Button */}
-      {(hasActiveFilter('shift') || hasActiveFilter('auditor') || 
-        hasActiveFilter('auditee') || hasActiveFilter('machinesAudited')) && (
+      {/* Clear filters button */}
+      {anyActiveFilter && (
         <Box sx={{ mb: 2, display: 'flex', justifyContent: 'flex-end' }}>
-          <Button
-            variant="outlined"
-            color="error"
-            startIcon={<ClearIcon />}
-            onClick={clearAllColumnFilters}
-            sx={{ borderRadius: '16px' }}
-          >
+          <Button variant="outlined" color="error" startIcon={<ClearIcon />} onClick={clearAllColumnFilters} sx={{ borderRadius: '16px' }}>
             Clear Column Filters
           </Button>
         </Box>
       )}
 
-      {/* Active Filters Display */}
-      {(hasActiveFilter('shift') || hasActiveFilter('auditor') || 
-        hasActiveFilter('auditee') || hasActiveFilter('machinesAudited')) && (
+      {/* Active filter chips */}
+      {anyActiveFilter && (
         <Box sx={{ mb: 2, p: 2, bgcolor: '#f5f5f5', borderRadius: 2 }}>
-          <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
-            Active Column Filters:
-          </Typography>
+          <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>Active Column Filters:</Typography>
           <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
             {columnFilters.shift.length > 0 && (
-              <Chip
-                label={`Shift: ${columnFilters.shift.join(', ')}`}
-                onDelete={() => clearColumnFilter('shift')}
-                size="small"
-                color="primary"
-                variant="outlined"
-              />
+              <Chip label={`Shift: ${columnFilters.shift.join(', ')}`} onDelete={() => clearColumnFilter('shift')} size="small" color="primary" variant="outlined" />
             )}
             {columnFilters.auditor && (
-              <Chip
-                label={`Auditor: ${columnFilters.auditor}`}
-                onDelete={() => clearColumnFilter('auditor')}
-                size="small"
-                color="primary"
-                variant="outlined"
-              />
+              <Chip label={`Auditor: ${columnFilters.auditor}`} onDelete={() => clearColumnFilter('auditor')} size="small" color="primary" variant="outlined" />
             )}
             {columnFilters.auditee && (
-              <Chip
-                label={`Auditee: ${columnFilters.auditee}`}
-                onDelete={() => clearColumnFilter('auditee')}
-                size="small"
-                color="primary"
-                variant="outlined"
-              />
+              <Chip label={`Auditee: ${columnFilters.auditee}`} onDelete={() => clearColumnFilter('auditee')} size="small" color="primary" variant="outlined" />
             )}
             {hasActiveFilter('machinesAudited') && (
-              <Chip
-                label="Machines: Filtered"
-                onDelete={() => clearColumnFilter('machinesAudited')}
-                size="small"
-                color="primary"
-                variant="outlined"
-              />
+              <Chip label="Machines: Filtered" onDelete={() => clearColumnFilter('machinesAudited')} size="small" color="primary" variant="outlined" />
             )}
           </Stack>
         </Box>
       )}
 
-      {/* Table with column filters */}
+      {/* Error state */}
+      {error && (
+        <Box sx={{ mb: 2, p: 2, bgcolor: '#fff3f3', borderRadius: 2, border: '1px solid #ffcdd2' }}>
+          <Typography color="error">⚠️ {error}</Typography>
+          <Button size="small" onClick={fetchAuditLogs} sx={{ mt: 1 }}>Retry</Button>
+        </Box>
+      )}
+
+      {/* Table */}
       <TableContainer component={Paper} className="table-wrapper">
         <Table className="audit-table">
           <TableHead>
             <TableRow>
-              {columns.map((column) => (
-                <TableCell 
-                  key={column.id} 
-                  align={column.align}
-                  sx={{ 
-                    color: '#404040 !important',
-                    fontWeight: '600 !important',
-                    fontSize: '14px !important',
-                    borderRight: '1px solid #E4E4E4'
-                  }}
-                >
+              {columns.map((col) => (
+                <TableCell key={col.id} align={col.align} sx={{ color: '#404040 !important', fontWeight: '600 !important', fontSize: '14px !important', borderRight: '1px solid #E4E4E4' }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <span>{column.label}</span>
-                    {column.filterable && (
-                      <IconButton
-                        size="small"
-                        onClick={(e) => handleColumnFilterClick(e, column.id)}
-                        sx={{
-                          color: hasActiveFilter(column.id) ? '#0077B6' : '#666',
-                          '&:hover': { color: '#0077B6' }
-                        }}
-                      >
+                    <span>{col.label}</span>
+                    {col.filterable && (
+                      <IconButton size="small" onClick={(e) => handleColumnFilterClick(e, col.id)} sx={{ color: hasActiveFilter(col.id) ? '#0077B6' : '#666', '&:hover': { color: '#0077B6' } }}>
                         <FilterListIcon fontSize="small" />
                       </IconButton>
                     )}
@@ -686,8 +352,17 @@ const AuditLogsTable = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {paginatedData.length > 0 ? (
-              paginatedData.map((log) => (
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={9} align="center" sx={{ py: 6 }}>
+                  <CircularProgress size={32} />
+                  <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                    Loading audit logs...
+                  </Typography>
+                </TableCell>
+              </TableRow>
+            ) : rows.length > 0 ? (
+              rows.map((log) => (
                 <TableRow key={log.id}>
                   <TableCell sx={{ borderRight: '1px solid #E4E4E4' }}>{log.timestamp}</TableCell>
                   <TableCell sx={{ borderRight: '1px solid #E4E4E4' }}>{log.shift}</TableCell>
@@ -698,11 +373,7 @@ const AuditLogsTable = () => {
                   <TableCell sx={{ borderRight: '1px solid #E4E4E4' }}>{log.severeViolations}</TableCell>
                   <TableCell sx={{ borderRight: '1px solid #E4E4E4' }}>{log.machinesAudited.join(', ')}</TableCell>
                   <TableCell align="center">
-                    <IconButton
-                      className="action-icon"
-                      size="small"
-                      onClick={() => handleActionClick(log)}
-                    >
+                    <IconButton className="action-icon" size="small" onClick={() => handleActionClick(log)}>
                       <ArrowForwardIcon />
                     </IconButton>
                   </TableCell>
@@ -724,15 +395,15 @@ const AuditLogsTable = () => {
       {/* Pagination */}
       <div className="pagination-container">
         <Typography className="pagination-info">
-          Showing {filteredAndSortedData.length > 0 ? page * rowsPerPage + 1 : 0} to {Math.min((page + 1) * rowsPerPage, filteredAndSortedData.length)} of {filteredAndSortedData.length} entries
+          Showing {total > 0 ? page * rowsPerPage + 1 : 0} to {Math.min((page + 1) * rowsPerPage, total)} of {total} entries
         </Typography>
         <TablePagination
           component="div"
-          count={filteredAndSortedData.length}
+          count={total}
           page={page}
-          onPageChange={handleChangePage}
+          onPageChange={(e, newPage) => setPage(newPage)}
           rowsPerPage={rowsPerPage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
+          onRowsPerPageChange={(e) => { setRowsPerPage(parseInt(e.target.value, 10)); setPage(0); }}
           rowsPerPageOptions={[5, 10, 20]}
           labelRowsPerPage="Rows per page:"
         />
@@ -740,17 +411,11 @@ const AuditLogsTable = () => {
 
       {/* Column Filter Popover */}
       <Popover
-        open={columnFilterOpen}
+        open={Boolean(columnFilterAnchor)}
         anchorEl={columnFilterAnchor}
         onClose={handleColumnFilterClose}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'left',
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'left',
-        }}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'left' }}
       >
         {renderColumnFilter()}
       </Popover>
