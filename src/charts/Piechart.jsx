@@ -4,6 +4,12 @@ import HighchartsReact from 'highcharts-react-official';
 import './Piechart.css';
 
 const PieChart = ({ percentage, label, color = '#34A853' }) => {
+  // ✅ Always a valid number between 0–100
+  const safeValue = isFinite(Number(percentage)) ? Number(percentage) : 0;
+
+  // ✅ Don't render if value is missing
+  if (!safeValue) return null;
+
   const chartOptions = {
     chart: {
       type: 'pie',
@@ -11,50 +17,35 @@ const PieChart = ({ percentage, label, color = '#34A853' }) => {
       width: 145,
       backgroundColor: 'transparent',
       spacing: [0, 0, 0, 0],
-      margin: [0, 0, 0, 0]
+      margin: [0, 0, 0, 0],
     },
     title: {
-      text: `${percentage}%`,
+      text: `${safeValue}%`,
       align: 'center',
       verticalAlign: 'middle',
-      style: {
-        fontSize: '11px',
-        fontWeight: 'bold',
-        color: '#34A853',
-        lineHeight: '11px'
-      },
+      style: { fontSize: '11px', fontWeight: 'bold', color: '#34A853' },
       y: 2,
-      x: 0
     },
-    tooltip: {
-      enabled: false
-    },
+    tooltip: { enabled: false },
     plotOptions: {
       pie: {
         innerSize: '75%',
-        dataLabels: {
-          enabled: false
-        },
+        dataLabels: { enabled: false },
         enableMouseTracking: false,
-        states: {
-          hover: {
-            enabled: false
-          }
-        },
+        states: { hover: { enabled: false } },
         borderWidth: 0,
-        center: ['50%', '50%']
-      }
+        center: ['50%', '50%'],
+      },
     },
     series: [{
       name: 'Percentage',
+      // ✅ Both values explicitly cast to Number
       data: [
-        { y: percentage, color: color },
-        { y: 100 - percentage, color: '#E5E7EB' }
-      ]
+        { y: Number(safeValue),           color: color    },
+        { y: Number(100 - safeValue),     color: '#E5E7EB' },
+      ],
     }],
-    credits: {
-      enabled: false
-    }
+    credits: { enabled: false },
   };
 
   return (
